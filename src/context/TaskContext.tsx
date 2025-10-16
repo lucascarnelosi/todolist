@@ -17,10 +17,11 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
   }
 
   function addTask(value: string) {
+    const formattedValue = value.trim()
     const tasksNames = tasks.map((task) => task.name);
 
     const taskAlreadyExists = tasksNames.some(
-      (item) => item.toLowerCase() === value.toLowerCase()
+      (item) => item === formattedValue
     );
 
     if (taskAlreadyExists) {
@@ -29,17 +30,21 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
-    if (value) {
-      setTasks((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          name: wordFormatter(value),
-          done: false,
-          editing: false,
-        },
-      ]);
+    if (!formattedValue) {
+      alert("O campo está vazio")
+
+      return;
     }
+
+    setTasks((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        name: wordFormatter(formattedValue),
+        done: false,
+        editing: false,
+      },
+    ]);
   }
 
   function editTask({ taskId, currentValue, newValue }: EditTaskProps) {
@@ -48,7 +53,7 @@ export const TaskProvider = ({ children }: { children: ReactNode }) => {
     const tasksNames = tasks.map((task) => task.name);
 
     const taskAlreadyExists = tasksNames.some(
-      (item) => item.toLowerCase() === newValue.toLowerCase()
+      (item) => item === newValue
     );
 
     if (taskAlreadyExists) {

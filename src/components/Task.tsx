@@ -74,7 +74,7 @@ export function Task({ task }: TaskItemProps) {
             onChange={(e) => setInputTask(wordFormatter(e.target.value))}
           />
         ) : (
-          <span className="text-white">{inputTask}</span>
+          <span className="text-white">{task.name}</span>
         )}
       </div>
       <div className="flex gap-4">
@@ -89,7 +89,10 @@ export function Task({ task }: TaskItemProps) {
             <Pencil
               color="#999"
               cursor="pointer"
-              onClick={() => handleActiveTaskEditing(task.id)}
+              onClick={() => {
+                setInputTask(task.name)
+                handleActiveTaskEditing(task.id)
+              }}
             />
 
             <Trash2

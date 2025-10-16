@@ -1,6 +1,7 @@
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTasks } from "../hooks/useTasks";
+import { wordFormatter } from "../utils/wordFormatter";
 
 export function TaskInput() {
   const { addTask } = useTasks();
@@ -25,7 +26,7 @@ export function TaskInput() {
           className="bg-white p-1 m-0"
           value={inputTextTask}
           placeholder="Digite sua nova atividade..."
-          onChange={(e) => setInputTextTask(e.target.value)}
+          onChange={(e) => setInputTextTask(wordFormatter(e.target.value))}
         />
         <button
           className="flex items-center justify-center bg-blue-700 text-white text-2xl size-9 hover:bg-blue-800 rounded-2xl"
