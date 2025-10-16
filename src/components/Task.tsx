@@ -1,101 +1,105 @@
-import { useState } from "react"
-import { useTasks } from '../hooks/useTasks'
-import type { TaskProps } from '../types/Task'
-import { wordFormatter } from '../utils/wordFormatter'
-import { SquareCheckBig, Square, CircleX, Pencil, Check } from 'lucide-react'
+import {
+  Check,
+  CircleX,
+  Pencil,
+  Square,
+  SquareCheckBig,
+  Trash2,
+} from "lucide-react";
+import { useState } from "react";
+import { useTasks } from "../hooks/useTasks";
+import type { TaskProps } from "../types/Task";
+import { wordFormatter } from "../utils/wordFormatter";
 
-export function Task(p: TaskProps) {
-  const { tasks, setTasks } = useTasks()
-  const [check, setCheck] = useState(p.done)
-  const [inputTask, setInputTask] = useState(p.name)
+type TaskItemProps = {
+  task: TaskProps;
+};
 
-  function done() {
-    setCheck(prev => !prev)
-    setTasks(prev => 
-      prev.map(t => 
-        t.id === p.id
-        ? { ...t, done: !t.done }
-        : t
-      )
-    )
+export function Task({ task }: TaskItemProps) {
+  const {
+    completeTask,
+    editTask,
+    removeTask,
+    currentTaskEditing,
+    handleActiveTaskEditing,
+  } = useTasks();
+  const [inputTask, setInputTask] = useState(task.name);
+
+  const isEditing = currentTaskEditing === task.id;
+
+  function handleEditTask() {
+    const isSuccess = editTask({
+      taskId: task.id,
+      currentValue: task.name,
+      newValue: inputTask,
+    });
+
+    if (isSuccess) handleActiveTaskEditing(null);
   }
 
-  function removeTask() {
-    const newTasksArray = tasks.filter(t => t.name !== p.name)
-
-    setTasks(newTasksArray)
-  }
-
-  function editTask() {
-    // const tasksNamesArray = tasks.map(task => task.name)
-    // const othersTasksNames = tasksNamesArray.filter(tasksNames => tasksNames !== inputTask)
-    
-    setTasks(prev => 
-      prev.map(t => 
-        t.id === p.id
-        ? { ...t,
-            name: inputTask,
-            editing: !p.editing
-          }
-        : t
-      )
-    )
+  function cancelEditing() {
+    handleActiveTaskEditing(null);
+    setInputTask(task.name);
   }
 
   return (
     <div className="flex items-center justify-between w-75 m-auto p-2">
       <div className="flex items-center gap-3">
         <button>
-          {check
-          ? <SquareCheckBig
-              onClick={done}
+          {task.done ? (
+            <SquareCheckBig
+              onClick={() => completeTask(task.id)}
               className="rounded-full"
               cursor="pointer"
               color="#00ff00"
             />
-          : <Square
-              onClick={done}
+          ) : (
+            <Square
+              onClick={() => completeTask(task.id)}
               color="#fff"
               cursor="pointer"
             />
-          }
+          )}
         </button>
-        {p.editing
-        ? <input
+        {isEditing ? (
+          <input
             type="text"
             name="editTxtName"
             id="editTxtId"
             size={18}
+            maxLength={20}
             className="text-white"
             autoFocus
             value={inputTask}
-            onChange={e => setInputTask(wordFormatter(e.target.value))}
-            onBlur={editTask}
+            onChange={(e) => setInputTask(wordFormatter(e.target.value))}
           />
-        : <div className="text-white">
-            {inputTask}
-          </div>
-        }
+        ) : (
+          <span className="text-white">{inputTask}</span>
+        )}
       </div>
       <div className="flex gap-4">
-        {p.editing
-        ? <Check
-            color="#ccc"
-            cursor="pointer"
-            onClick={editTask}
-          />
-        : <Pencil
-            color="#999"
-            cursor="pointer"
-            onClick={editTask}
-          />
-        }
-        <CircleX
-          color="#9f0000"
-          cursor="pointer"
-          onClick={removeTask}
-        />
+        {isEditing ? (
+          <>
+            <Check color="#ccc" cursor="pointer" onClick={handleEditTask} />
+
+            <CircleX color="#9f0000" cursor="pointer" onClick={cancelEditing} />
+          </>
+        ) : (
+          <>
+            <Pencil
+              color="#999"
+              cursor="pointer"
+              onClick={() => handleActiveTaskEditing(task.id)}
+            />
+
+            <Trash2
+              color="#9f0000"
+              cursor="pointer"
+              onClick={() => removeTask(task.id)}
+            />
+          </>
+        )}
       </div>
     </div>
-  )
+  );
 }

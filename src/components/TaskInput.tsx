@@ -1,35 +1,15 @@
-import { useState } from "react"
-import { Plus } from 'lucide-react'
-import { useTasks } from '../hooks/useTasks'
-import { wordFormatter } from '../utils/wordFormatter'
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import { useTasks } from "../hooks/useTasks";
 
 export function TaskInput() {
-  const { tasks, setTasks } = useTasks()
-  const [inputTextTask, setInputTextTask] = useState('')
+  const { addTask } = useTasks();
+  const [inputTextTask, setInputTextTask] = useState("");
 
-  function addTask() {
-    const tasksNames = tasks.map(task => task.name).toString()
-    
-    if(tasksNames.toLowerCase().includes(inputTextTask.toLowerCase())) {
-      alert('Não foi possível adicionar a atividade.')
-      setInputTextTask('')
+  function handleAddTask() {
+    addTask(inputTextTask);
 
-      return
-    }
-
-    if(inputTextTask) {
-      setTasks(prev => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          name: wordFormatter(inputTextTask),
-          done: false,
-          editing: false,
-        }
-      ])
-
-      setInputTextTask('')
-    }
+    setInputTextTask("");
   }
 
   return (
@@ -41,6 +21,7 @@ export function TaskInput() {
           name="nametxt"
           id="idtxt"
           size={40}
+          maxLength={20}
           className="bg-white p-1 m-0"
           value={inputTextTask}
           placeholder="Digite sua nova atividade..."
@@ -49,11 +30,11 @@ export function TaskInput() {
         <button
           className="flex items-center justify-center bg-blue-700 text-white text-2xl size-9 hover:bg-blue-800 rounded-2xl"
           type="submit"
-          onClick={addTask}
+          onClick={handleAddTask}
         >
           <Plus />
         </button>
       </div>
     </div>
-  )
+  );
 }
