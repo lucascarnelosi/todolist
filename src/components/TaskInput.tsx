@@ -8,28 +8,27 @@ export function TaskInput() {
   const [inputTextTask, setInputTextTask] = useState('')
 
   function addTask() {
-    const tasksNames = tasks.map(task => task.name).toString()
+    const tasksNames = tasks.map(task => task.name)
+    const isTaskExist = tasksNames.some(task => task == inputTextTask)
     
-    if(tasksNames.toLowerCase().includes(inputTextTask.toLowerCase())) {
+    if (isTaskExist || !inputTextTask.trim()) {
       alert('Não foi possível adicionar a atividade.')
       setInputTextTask('')
 
-      return
+      return;
     }
 
-    if(inputTextTask) {
-      setTasks(prev => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          name: wordFormatter(inputTextTask),
-          done: false,
-          editing: false,
-        }
-      ])
+    setTasks(prev => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        name: wordFormatter(inputTextTask),
+        done: false,
+        editing: false,
+      }
+    ])
 
-      setInputTextTask('')
-    }
+    setInputTextTask('')
   }
 
   return (
@@ -41,10 +40,11 @@ export function TaskInput() {
           name="nametxt"
           id="idtxt"
           size={40}
+          maxLength={20}
           className="bg-white p-1 m-0"
           value={inputTextTask}
           placeholder="Digite sua nova atividade..."
-          onChange={(e) => setInputTextTask(e.target.value)}
+          onChange={(e) => setInputTextTask(wordFormatter(e.target.value))}
         />
         <button
           className="flex items-center justify-center bg-blue-700 text-white text-2xl size-9 hover:bg-blue-800 rounded-2xl"

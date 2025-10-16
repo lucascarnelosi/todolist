@@ -4,7 +4,6 @@ export interface TaskProps {
   id: string,
   name: string,
   done: boolean,
-  editing: boolean
 }
 
 export interface TaskContextType {

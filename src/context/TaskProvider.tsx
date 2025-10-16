@@ -1,5 +1,5 @@
 import { TaskContext } from "./TaskContext";
-import type { TaskProps } from "../types/Task";
+import type { TaskProps } from "../types/task";
 import { useState, type ReactNode } from "react";
 
 export const TaskProvider = ({ children }: { children: ReactNode }) => {

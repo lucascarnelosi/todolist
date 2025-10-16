@@ -1,43 +1,49 @@
 import { useState } from "react"
 import { useTasks } from '../hooks/useTasks'
-import type { TaskProps } from '../types/Task'
+import type { TaskProps } from '../types/task'
 import { wordFormatter } from '../utils/wordFormatter'
-import { SquareCheckBig, Square, CircleX, Pencil, Check } from 'lucide-react'
+import { SquareCheckBig, Square, CircleX, Pencil, Check, Trash2 } from 'lucide-react'
 
 export function Task(p: TaskProps) {
   const { tasks, setTasks } = useTasks()
-  const [check, setCheck] = useState(p.done)
   const [inputTask, setInputTask] = useState(p.name)
+  const [isEditing, setIsEditing] = useState(false)
 
-  function done() {
-    setCheck(prev => !prev)
+  function completeTask() {
     setTasks(prev => 
-      prev.map(t => 
-        t.id === p.id
-        ? { ...t, done: !t.done }
-        : t
+      prev.map(task => 
+        task.id === p.id
+        ? { ...task, done: !task.done }
+        : task
       )
     )
   }
 
   function removeTask() {
-    const newTasksArray = tasks.filter(t => t.name !== p.name)
+    const newTasksArray = tasks.filter(task => task.name !== p.name)
 
     setTasks(newTasksArray)
   }
 
   function editTask() {
-    // const tasksNamesArray = tasks.map(task => task.name)
-    // const othersTasksNames = tasksNamesArray.filter(tasksNames => tasksNames !== inputTask)
+    const tasksNames = tasks.map(task => task.name)
+    const isTaskExist = tasksNames.some(task => task == inputTask)
+
+    setIsEditing(prev => !prev)
     
+    if (isTaskExist || !inputTask.trim()) {
+      alert('Não foi possível editar a atividade.')
+      
+      return;
+    }
+
     setTasks(prev => 
-      prev.map(t => 
-        t.id === p.id
-        ? { ...t,
+      prev.map(task => 
+        task.id === p.id
+        ? { ...task,
             name: inputTask,
-            editing: !p.editing
           }
-        : t
+        : task
       )
     )
   }
@@ -46,55 +52,70 @@ export function Task(p: TaskProps) {
     <div className="flex items-center justify-between w-75 m-auto p-2">
       <div className="flex items-center gap-3">
         <button>
-          {check
+          {p.done
           ? <SquareCheckBig
-              onClick={done}
+              onClick={completeTask}
               className="rounded-full"
               cursor="pointer"
               color="#00ff00"
             />
           : <Square
-              onClick={done}
+              onClick={completeTask}
               color="#fff"
               cursor="pointer"
             />
           }
         </button>
-        {p.editing
+        {isEditing
         ? <input
             type="text"
             name="editTxtName"
             id="editTxtId"
             size={18}
+            maxLength={20}
             className="text-white"
             autoFocus
             value={inputTask}
             onChange={e => setInputTask(wordFormatter(e.target.value))}
-            onBlur={editTask}
           />
         : <div className="text-white">
-            {inputTask}
+            {p.name}
           </div>
         }
       </div>
       <div className="flex gap-4">
-        {p.editing
-        ? <Check
-            color="#ccc"
-            cursor="pointer"
-            onClick={editTask}
-          />
-        : <Pencil
-            color="#999"
-            cursor="pointer"
-            onClick={editTask}
-          />
+        {isEditing
+        ? <>
+            <Check
+              color="#ccc"
+              cursor="pointer"
+              onClick={editTask}
+            />
+            <CircleX
+              color="#9f0000"
+              cursor="pointer"
+              onClick={() => {
+                setInputTask(p.name)
+                setIsEditing(prev => !prev)
+              }}
+            />
+          </>
+        : <>
+            <Pencil
+              color="#999"
+              cursor="pointer"
+              onClick={() => {
+                setInputTask(p.name)
+                setIsEditing(prev => !prev)
+              }}
+            />
+            <Trash2
+              color="#9f0000"
+              cursor="pointer"
+              onClick={removeTask}
+            />
+          </>
         }
-        <CircleX
-          color="#9f0000"
-          cursor="pointer"
-          onClick={removeTask}
-        />
       </div>
     </div>
   )
